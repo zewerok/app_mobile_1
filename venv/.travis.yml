@@ -31,7 +31,7 @@ install:
   - ls bin/ -l
   - echo "TODO"
   - gem install dpl --pre
-  - dpl releases --token $GITHUB_TOKEN --file "bin/mortgagecalculator-1.5-armeabi-v7a-debug.apk" --tag_name "v.1.5"
+  - dpl releases --token $GITHUB_TOKEN --file "bin/kopitin-0.1-armeabi-v7a-debug.apk" --tag_name "v.1.5"
   - echo "TODO COMPILE 64bit"
   - ls -la
   - rm -r -f .buildozer
