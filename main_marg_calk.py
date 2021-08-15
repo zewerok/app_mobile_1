@@ -12,24 +12,42 @@ from kivymd.uix.list import OneLineIconListItem, MDList
 
 from kivymd.uix.tab import MDTabsBase
 from kivymd.uix.floatlayout import MDFloatLayout
+
+from kivymd.font_definitions import fonts
+from kivymd.icon_definitions import md_icons
+
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.clock import Clock
-from kivymd.icon_definitions import md_icons
-from kivymd.font_definitions import fonts
+
 from kivymd.uix.picker import MDDatePicker
 import datetime
 import calendar
 
 from kivy.graphics import Color, Rectangle, Line, Ellipse
 from random import random as r
-from kivy.uix.floatlayout import FloatLayout
 
+from kivymd.uix.datatables import MDDataTable
+from kivy.metrics import dp
+
+from kivymd.uix.button import MDFlatButton
+from kivymd.uix.dialog import MDDialog
+
+from kivymd.app import MDApp
+from kivy.uix.floatlayout import FloatLayout
+from kivy_garden.mapview import MapView
 
 KV = '''
 #https://stackoverflow.com/questions/65698145/kivymd-tab-name-containing-icons-and-text
 # this import will prevent disappear tabs through some clicks on them)))
 #:import md_icons kivymd.icon_definitions.md_icons
 #:import fonts kivymd.font_definitions.fonts
+
+#: import MapView kivy_garden.mapview.MapView
+<Exemple_Map>:
+    MapView:
+        lat: 24.0555
+        lon: 90.9802
+        zoom: 10
 
 # Menu item in the DrawerList list.
 <ItemDrawer>:
@@ -66,10 +84,12 @@ KV = '''
         height: self.texture_size[1]
 
     MDLabel:
-        text: app.who_is
+        text: app.by_who
         font_style: "Caption"
         size_hint_y: None
         height: self.texture_size[1]
+
+
 
     ScrollView:
 
@@ -90,17 +110,19 @@ Screen:
                     orientation: 'vertical'
 
                     MDToolbar:
-                        title: app.title 
+                        title: app.title
                         elevation: 10
-                        left_action_items: [['menu', lambda x: nav_drawer.set_state('open')]]
+                        left_action_items: [['menu', lambda x: nav_drawer.set_state("open")]]
                         right_action_items: [["star-outline", lambda x: app.on_star_click()]]
                         md_bg_color: 0, 0, 0, 1
+
                     MDTabs:
                         id: tabs
-                        on_tab_switch: app.on_tab_switch(*args)
+                        on_tab_switch: app.on_tab_switch(*args)                        
                         height: "48dp"
                         tab_indicator_anim: False
                         background_color: 0.1, 0.1, 0.1, 1
+
                         Tab:
                             id: tab1
                             name: 'tab1'
@@ -180,12 +202,40 @@ Screen:
 
                                 MDSeparator:
                                     height: "1dp"
-                                    
-                                MDIconButton:
-                                    icon: "language-python"
-                                    pos_hint: {"center_x": .5, "center_y": .5}
-                                    on_release: app.calc_table(*args)
-                                    on_release: app.calc_map(*args)
+
+
+                                BoxLayout:
+                                    orientation: 'horizontal'
+
+                                    AnchorLayout:
+                                        anchor_x: 'center'
+
+                                        MDRectangleFlatIconButton:
+                                            icon: "android"
+                                            text: "BUTTON1"
+                                            adaptive_width: True
+                                            on_release: app.calc_table(*args)
+
+                                    AnchorLayout:
+                                        anchor_x: 'center'
+
+                                        MDRectangleFlatIconButton:
+                                            icon: "android"
+                                            text: "BUTTON2"
+                                            theme_text_color: "Custom"
+                                            text_color: 1, 1, 1, 1
+                                            line_color: 0, 0, 0, 1
+                                            icon_color: 1, 0, 0, 1
+                                            md_bg_color: 0, 0, 0, 1
+                                            on_release: app.share_it(*args)
+
+                                    AnchorLayout:
+                                        anchor_x: 'center'
+
+                                        Button:
+                                            text: "Test Ok"
+                                            size_hint_y: .5
+                                            background_color: (0.1, 0.1, 0.1, 1.0)
 
                                 BoxLayout:
                                     orientation: 'horizontal'
@@ -242,13 +292,11 @@ Screen:
                             name: 'tab2'
                             text: f"[size=20][font={fonts[-1]['fn_regular']}]{md_icons['table-large']}[/size][/font] Table"
 
-                            BoxLayout:
-                                orientation: 'vertical'
-                                padding: "10dp"
-                                
-                                ScrollView:
-                                    MDList:
-                                        id: calc_data_table
+                            ScrollView:
+
+                                BoxLayout:
+                                    orientation: 'vertical'
+                                    id: calc_data_table
 
                             MDFloatingActionButton:
                                 icon: "email-outline"
@@ -406,58 +454,25 @@ Screen:
                         Tab:
                             id: tab6
                             name: 'tab6'
-                            text: f"[size=20][font={fonts[-1]['fn_regular']}]{md_icons['table-large']}[/size][/font] Table"
+                            text: f"[size=20][font={fonts[-1]['fn_regular']}]{md_icons['book-open-variant']}[/size][/font] Map"
                             
-                            BoxLayout:
-                                orientation: 'vertical'
-                                padding: "10dp"
-                                
-                                ScrollView:
-                                    MDList:
-                                        id: calc_map
-
-
-
         MDNavigationDrawer:
             id: nav_drawer
 
             ContentNavigationDrawer:
                 id: content_drawer
-<ItemTable>:
-    size_hint_y: None
-    height: "42dp"
-    
-    canvas:
-        Color:
-            rgba: root.color
-        Rectangle:
-            size: self.size
-            pos: self.pos
-    MDLabel:
-        text: root.num
-        halign: "center"
-    MDLabel:
-        text: root.date
-        halign: "center" 
-    MDLabel:
-        text: root.payment
-        halign: "center" 
-    MDLabel:
-        text: root.interest
-        halign: "center"
-    MDLabel:
-        text: root.principal
-        halign: "center"
-    MDLabel:
-        text: root.debt
-        halign: "center"              
 
-#: import MapView kivy_garden.mapview.MapView
-<Exemple_Map>:
-    MapView:
-        lat: 24.0555
-        lon: 90.9802
-        zoom: 10
+<ContentDialogSend>
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "120dp"
+
+    MDTextField:
+        hint_text: "City"
+
+    MDTextField:
+        hint_text: "Street"
 '''
 
 
@@ -481,21 +496,14 @@ class DrawerList(ThemableBehavior, MDList):
                 break
         instance_item.text_color = self.theme_cls.primary_color
 
+
 class Tab(MDFloatLayout, MDTabsBase):
     pass
 
-class ItemTable(BoxLayout):
-    num = StringProperty()
-    date = StringProperty()
-    payment = StringProperty()
-    interest = StringProperty()
-    principal = StringProperty()
-    debt = StringProperty()
-    color = ListProperty()
 
-class Exemple_Map(FloatLayout):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+class ContentDialogSend(BoxLayout):
+    pass
+
 
 # https://stackoverflow.com/questions/2249956/how-to-get-the-same-day-of-next-month-of-a-given-day-in-python-using-datetime
 def next_month_date(d):
@@ -508,29 +516,100 @@ def next_month_date(d):
     next_month = next_month.replace(year=_year, month=_month)
     return next_month
 
+
+#https://kivy.org/doc/stable/examples/gen__canvas__canvas_stress__py.html
 def show_canvas_stress(wid):
     with wid.canvas:
         for x in range(10):
             Color(r(), 1, 1, mode='hsv')
             Rectangle(pos=(r() * wid.width + wid.x, r() * wid.height + wid.y), size=(20, 20))
 
-def draw_graph(wid):
+
+def draw_graph(wid, start_date, loan, months, interest, payment_type):
     #print(wid.x, wid.y)
     with wid.canvas:
         Color(.2, .2, .2, 1)
-        Line(rectangle=(20, 60, wid.width-20, wid.height-20), width=2)
+        Line(rectangle=(wid.x, wid.y, wid.width, wid.height), width=1)
+    graph_height = wid.height
+    delta_width = wid.width / months
+
+    percent = interest / 100 / 12
+    monthly_payment = loan * (percent + percent / ((1 + percent) ** months - 1))
+
+    debt_end_month = loan
+    for i in range(0, months):
+        repayment_of_interest = debt_end_month * percent
+        repayment_of_loan_body = monthly_payment - repayment_of_interest
+        debt_end_month = debt_end_month - repayment_of_loan_body
+        delta_height_interest = int(repayment_of_interest * graph_height / monthly_payment)
+        delta_height_loan = int(repayment_of_loan_body * graph_height / monthly_payment)
+        #print("####: ", delta_height_loan, delta_height_loan)
+        #print(monthly_payment, repayment_of_interest, repayment_of_loan_body, debt_end_month)
+        with wid.canvas:
+            Color(1, 0, 0, 1)
+            Rectangle(pos=(wid.x + int(i * delta_width), wid.y), size=(int(delta_width), delta_height_loan))
+            Color(0, 0, 1, 1)
+            Rectangle(pos=(wid.x + int(i * delta_width), wid.y+delta_height_loan), size=(int(delta_width), delta_height_interest))
 
 
-class KopitinBro(MDApp):
-    title = "Kopitin Bro"
-    who_is = "Kopitin Boss"
+def draw_chart(wid, total_amount_of_payments, loan):
+    interest_chart = ((total_amount_of_payments - loan) * 360) / total_amount_of_payments
+    circle_width = wid.width
+    center_x = 0
+    center_y = wid.height // 2 - circle_width // 2
+    if (wid.width > wid.height):
+        circle_width = wid.height
+        center_x = wid.width // 2 - circle_width // 2
+        center_y = 0
+    #print(wid.x, wid.y)
+    with wid.canvas:
+        Color(0, 0, 1, 1)
+        Ellipse(pos=(wid.x+center_x, wid.y+center_y), size=(circle_width, circle_width), angle_start=360-int(interest_chart), angle_end=360)
+        Color(1, 0, 0, 1)
+        Ellipse(pos=(wid.x+center_x, wid.y+center_y), size=(circle_width, circle_width), angle_start=0, angle_end=360-int(interest_chart))
+
+class Map(FloatLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+# https://pypi.org/project/kivy-ios/
+# https://github.com/kivy/kivy-ios/issues/411
+# -----------------
+# https://stackoverflow.com/questions/38983649/kivy-android-share-image
+# https://stackoverflow.com/questions/63322944/how-to-use-share-button-to-share-content-of-my-app
+# Native method for Android.
+def share(title, text):
+    from kivy import platform
+
+    print(platform)
+    if platform == 'android':
+        from jnius import autoclass
+
+        PythonActivity = autoclass('org.kivy.android.PythonActivity')
+        Intent = autoclass('android.content.Intent')
+        String = autoclass('java.lang.String')
+        intent = Intent()
+        intent.setAction(Intent.ACTION_SEND)
+        intent.putExtra(Intent.EXTRA_TEXT, String('{}'.format(text)))
+        intent.setType('text/plain')
+        chooser = Intent.createChooser(intent, String(title))
+        PythonActivity.mActivity.startActivity(chooser)
+
+
+class MortgageCalculatorApp(MDApp):
+    title = "Mortgage Calculator"
+    by_who = "author Oleg Shpagin"
+    dialog = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        self.data_for_calc_is_changed = True
+
         self.screen = Builder.load_string(KV)
-#        menu_items = [{"viewclass": "IconListItem", "icon": "git", "height": dp(56), "text": f"Item {i}", "on_release": lambda x=f"Item {i}": self.set_item(x),} for i in range(5)]
-        menu_items = [{"icon": "format-text-rotation-angle-up", "text": "annuity"},
-                      {"icon": "format-text-rotation-angle-down", "text": "differentiated"}]
+        #https://kivymd.readthedocs.io/en/latest/components/menu/?highlight=MDDropDownItem#center-position
+        #menu_items = [{"icon": "git", "text": f"Item {i}"} for i in range(5)]
+        menu_items = [{"icon": "format-text-rotation-angle-up", "text": "annuity"}, {"icon": "format-text-rotation-angle-down", "text": "differentiated"}]
         self.menu = MDDropdownMenu(
             caller=self.screen.ids.payment_type,
             items=menu_items,
@@ -539,15 +618,16 @@ class KopitinBro(MDApp):
         )
         self.menu.bind(on_release=self.set_item)
 
-        # https://kivymd.readthedocs.io/en/latest/components/pickers/?highlight=date%20picker#
+        #https://kivymd.readthedocs.io/en/latest/components/pickers/?highlight=date%20picker#
         self.date_dialog = MDDatePicker(
             callback=self.get_date,
-            background_color=(0.1, 0.1, 0.1, 1.0),)
+            background_color=(0.1, 0.1, 0.1, 1.0),
+        )
 
-    def set_item(self, position_menu, position_menu_item):
+    def set_item(self, instance_menu, instance_menu_item):
         def set_item(interval):
-            self.screen.ids.payment_type.text = position_menu_item.text
-            position_menu.dismiss()
+            self.screen.ids.payment_type.text = instance_menu_item.text
+            instance_menu.dismiss()
 
         Clock.schedule_once(set_item, 0.5)
 
@@ -556,54 +636,86 @@ class KopitinBro(MDApp):
         :type date: <class 'datetime.date'>
         '''
         print(date)
-        self.screen.ids.start_date.text = date.strftime("%d-%m-%Y")  # str(date)
+        self.screen.ids.start_date.text = date.strftime("%d-%m-%Y") # str(date)
 
     def build(self):
         self.theme_cls.theme_style = "Light"  # "Dark"  # "Light"
         # return Builder.load_string(KV)
         return self.screen
-#    def build(self):
-#        return Builder.load_string(KV)
 
     def on_start(self):
         self.screen.ids.start_date.text = datetime.date.today().strftime("%d-%m-%Y")
-        self.screen.ids.loan.text = "300000"
+        self.screen.ids.loan.text = "50000"
         self.screen.ids.months.text = "12"
-        self.screen.ids.interest.text = "15"
+        self.screen.ids.interest.text = "22"
         self.screen.ids.payment_type.text = "annuity"
+
+        loan = self.screen.ids.loan.text
+        months = self.screen.ids.months.text
+        interest = self.screen.ids.interest.text
+        loan = float(loan)
+        months = int(months)
+        interest = float(interest)
+        percent = interest / 100 / 12
+        monthly_payment = loan * (percent + percent / ((1 + percent) ** months - 1))
+        total_amount_of_payments = monthly_payment * months
+        overpayment_loan = total_amount_of_payments - loan
+        effective_interest_rate = ((total_amount_of_payments / loan - 1) / (months / 12)) * 100
+
+        self.screen.ids.payment_label.text = str(round(monthly_payment, 2))
+        self.screen.ids.total_amount_of_payments_label.text = str(round(total_amount_of_payments, 2))
+        self.screen.ids.overpayment_loan_label.text = str(round(overpayment_loan, 2))
+        self.screen.ids.effective_interest_rate_label.text = str(round(effective_interest_rate, 2))
+
         icons_item_menu_lines = {
-            "account-cowboy-hat": "О Димане",
-            "account-multiple": "О его друзьях",
-            "coffee": "О его увлечениях",
-            }
+            "account-cowboy-hat": "About author",
+            "youtube": "My YouTube",
+            "coffee": "Donate author",
+            "github": "Source code",
+            "share-variant": "Share app",  #air-horn
+            "shield-sun": "Dark/Light",
+        }
         icons_item_menu_tabs = {
+            "calculator-variant": "Input",  #ab-testing
             "table-large": "Table",
-            "chart-pie": "Chart"
+            "chart-areaspline": "Graph",
+            "chart-pie": "Chart",  # chart-arc
+            "book-open-variant": "Sum",
         }
         for icon_name in icons_item_menu_lines.keys():
             self.root.ids.content_drawer.ids.md_list.add_widget(
                 ItemDrawer(icon=icon_name, text=icons_item_menu_lines[icon_name])
             )
-#        for name_tab in list(md_icons.keys())[15:30]:
-#            self.root.ids.tabs.add_widget(Tab(icon=name_tab, title=name_tab))
-#        for icon_name, name_tab in icons_item_menu_tabs.items():
-#            self.root.ids.tabs.add_widget(Tab(text=f"[size=20][font={fonts[-1]['fn_regular']}]{md_icons[icon_name]}[/font][/ref] {name_tab}"))
 
-    def on_tab_switch(
-            self, instance_tabs, instance_tab, instance_tab_label, tab_text
-    ):
-        '''
-        Called when switching tabs.
+        # To auto generate tabs
+        # for icon_name, name_tab in icons_item_menu_tabs.items():
+        #     self.root.ids.tabs.add_widget(
+        #         Tab(
+        #             text=f"[size=20][font={fonts[-1]['fn_regular']}]{md_icons[icon_name]}[/size][/font] {name_tab}"
+        #         )
+        #     )
 
-        :type instance_tabs: <kivymd.uix.tab.MDTabs object>;
-        :param instance_tab: <__main__.Tab object>;
-        :param instance_tab_label: <kivymd.uix.tab.MDTabsLabel object>;
-        :param tab_text: text or name icon of tab;
-        '''
-        # get the tab icon.
-        # count_icon = instance_tab.icon
-        # print it on shell/bash.
-        # print(f"Welcome to {count_icon}' tab'" + tab_text)
+    def on_tab_switch(self, *args):
+        # def on_tab_switch(self, instance_tabs, instance_tab, instance_tabs_label, tab_text):
+        '''Called when switching tabs.
+
+                :type instance_tabs: <kivymd.uix.tab.MDTabs object>;
+                :param instance_tab: <__main__.Tab object>;
+                :param instance_tab_label: <kivymd.uix.tab.MDTabsLabel object>;
+                :param tab_text: text or name icon of tab;
+                '''
+        # print(instance_tab.name + " : " + tab_text)
+        # print(args)
+        # print("tab clicked!" + instance_tab.ids.label.text)
+        ############# instance_tab.ids.label.text = tab_text
+        # print(instance_tab.ids.label.text)
+        if self.data_for_calc_is_changed:
+            self.calc_table(self, args)
+            self.data_for_calc_is_changed = False
+        pass
+
+    def on_star_click(self):
+        print("star clicked!")
 
     def calc_table(self, *args):
         print("button1 pressed")
@@ -625,93 +737,74 @@ class KopitinBro(MDApp):
         percent = interest / 100 / 12
         monthly_payment = loan * (percent + percent / ((1 + percent) ** months - 1))
         # print(monthly_payment)
-        self.screen.ids.calc_data_table.add_widget(ItemTable(
-            color = (0.2, 0.8, 0.8, 0.2),
-            num = "№",
-            date = "Date",
-            payment = "Payment",
-            interest = "Interest",
-            principal = "Principal",
-            debt = "Debt"
-        ))
+
         debt_end_month = loan
         for i in range(0, months):
-            row_color = (1,1,1,1)
-            if (i % 2 != 0):
-                row_color = (0.2, 0.2, 0.2, 0.2)
             repayment_of_interest = debt_end_month * percent
             repayment_of_loan_body = monthly_payment - repayment_of_interest
             debt_end_month = debt_end_month - repayment_of_loan_body
-            self.screen.ids.calc_data_table.add_widget(ItemTable(
-                color = row_color,
-                num=str(i+1),
-                date = start_date.strftime("%d-%m-%Y"),
-                payment = str(round(monthly_payment, 2)),
-                interest = str(round(repayment_of_interest, 2)),
-                principal = str(round(repayment_of_loan_body, 2)),
-                debt = str(round(debt_end_month, 2))
-            ))
-            start_date = next_month_date(start_date)
-
-        #     print(monthly_payment, repayment_of_interest, repayment_of_loan_body, debt_end_month)
-        #     row_data_for_tab.append(
-        #         [i + 1, start_date.strftime("%d-%m-%Y"), round(monthly_payment, 2), round(repayment_of_interest, 2),
-        #          round(repayment_of_loan_body, 2), round(debt_end_month, 2)])
-        # total_amount_of_payments = monthly_payment * months
-        # overpayment_loan = total_amount_of_payments - loan
-        # effective_interest_rate = ((total_amount_of_payments / loan - 1) / (months / 12)) * 100
+            # print(monthly_payment, repayment_of_interest, repayment_of_loan_body, debt_end_month)
+            row_data_for_tab.append(
+                [i + 1, start_date.strftime("%d-%m-%Y"), round(monthly_payment, 2), round(repayment_of_interest, 2),
+                 round(repayment_of_loan_body, 2), round(debt_end_month, 2)])
+        total_amount_of_payments = monthly_payment * months
+        overpayment_loan = total_amount_of_payments - loan
+        effective_interest_rate = ((total_amount_of_payments / loan - 1) / (months / 12)) * 100
         # print(total_amount_of_payments, overpayment_loan, effective_interest_rate)
 
+        start_date = next_month_date(start_date)
 
-        #
-        # # show_canvas_stress(self.screen.ids.graph)
-        # show_canvas_stress(self.screen.ids.chart)
-        #
-        # self.screen.ids.graph.canvas.clear()
-        # draw_graph(self.screen.ids.graph, start_date, loan, months, interest, payment_type)
-        #
-        # self.screen.ids.chart.canvas.clear()
-        # draw_chart(self.screen.ids.chart, total_amount_of_payments, loan)
-        #
-        # # https://kivymd.readthedocs.io/en/latest/components/datatables/?highlight=datatable
-        # data_tables = MDDataTable(
-        #     use_pagination=True,
-        #     rows_num=10,
-        #     column_data=[
-        #         ("№", dp(10)),
-        #         ("Date", dp(20)),
-        #         ("Payment", dp(20)),
-        #         ("Interest", dp(20)),
-        #         ("Principal", dp(20)),
-        #         ("Debt", dp(20)),
-        #     ],
-        #     row_data=row_data_for_tab,
-        # )
-        # self.screen.ids.calc_data_table.clear_widgets()
-        # self.screen.ids.calc_data_table.add_widget(data_tables)
-        # self.screen.ids.calc_data_table.clear_widgets()
-        # for i in range(0,100):
-        #     row_color = (0,0,0,1)
-        #     if (i % 2 != 0):
-        #         row_color = (1,1,1,1)
-        #     self.screen.ids.calc_data_table.add_widget(
-        #         ItemTable(
-        #             color = row_color,
-        #             text=str(i),
-        #         )
-        #     )
-
-        show_canvas_stress(self.screen.ids.graph)
+        # show_canvas_stress(self.screen.ids.graph)
         show_canvas_stress(self.screen.ids.chart)
-        draw_graph(self.screen.ids.graph)
+
+        self.screen.ids.graph.canvas.clear()
+        draw_graph(self.screen.ids.graph, start_date, loan, months, interest, payment_type)
+
+        self.screen.ids.chart.canvas.clear()
+        draw_chart(self.screen.ids.chart, total_amount_of_payments, loan)
+
+        self.screen.ids.map.canvas.clear()
+        Map(self.screen.ids.map, FloatLayout)
+
+        # https://kivymd.readthedocs.io/en/latest/components/datatables/?highlight=datatable
+        data_tables = MDDataTable(
+            use_pagination=True,
+            rows_num=10,
+            column_data=[
+                ("№", dp(10)),
+                ("Date", dp(20)),
+                ("Payment", dp(20)),
+                ("Interest", dp(20)),
+                ("Principal", dp(20)),
+                ("Debt", dp(20)),
+            ],
+            row_data=row_data_for_tab,
+        )
+        self.screen.ids.calc_data_table.clear_widgets()
+        self.screen.ids.calc_data_table.add_widget(data_tables)
+
         pass
+
+    def show_confirmation_dialog(self):
+        if not self.dialog:
+            self.dialog = MDDialog(
+                title="Share it:",
+                type="custom",
+                content_cls=ContentDialogSend(),
+                buttons=[
+                    MDFlatButton(
+                        text="CANCEL", text_color=self.theme_cls.primary_color
+                    ),
+                    MDFlatButton(
+                        text="SEND", text_color=self.theme_cls.primary_color
+                    ),
+                ],
+            )
+        self.dialog.open()
+
 
     def share_it(self, *args):
         share("title_share", "this content to share!")
-    def on_star_click(self):
-        print("star clicked!")
 
-    def calc_map(self, *args):
-        self.screen.ids.calc_map.add_widget(Exemple_Map())
 
-KopitinBro().run()
+MortgageCalculatorApp().run()
